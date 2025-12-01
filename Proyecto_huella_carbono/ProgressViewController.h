@@ -7,6 +7,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // El enchufe para la Gráfica (Outlet)
 @property (weak, nonatomic) IBOutlet GraphView *graphView;
+@property (weak, nonatomic) IBOutlet UIButton *btnReset;
 
 // El enchufe para el Botón (Action)
 - (IBAction)resetData:(id)sender;

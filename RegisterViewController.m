@@ -1,6 +1,7 @@
 #import "RegisterViewController.h"
 
 @interface RegisterViewController ()
+@property (nonatomic, assign) NSInteger currentCategoryIndex;
 @end
 
 @implementation RegisterViewController
@@ -8,125 +9,201 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    // --- Configuración Estética Inicial ---
-    self.imgIcon.layer.cornerRadius = 10;
-    self.btnCalculate.layer.cornerRadius = 8;
+    // 1. Estilo de los Botones Superiores
+    [self styleButton:self.btnTransport icon:@"car.fill" title:@"Transporte"];
+    [self styleButton:self.btnEnergy icon:@"bolt.fill" title:@"Energía"];
+    [self styleButton:self.btnHabit icon:@"leaf.fill" title:@"Hábito"];
     
-    // El mensaje inicia invisible
+    // 2. Estilo de la Imagen Principal
+    self.imgIcon.layer.cornerRadius = 20;
+    self.imgIcon.clipsToBounds = YES;
+    self.imgIcon.contentMode = UIViewContentModeScaleAspectFit;
+    
+    // 3. Estilo del Botón Calcular
+    self.btnCalculate.layer.cornerRadius = 12;
+    self.btnCalculate.layer.shadowColor = [UIColor systemBlueColor].CGColor;
+    self.btnCalculate.layer.shadowOpacity = 0.3;
+    self.btnCalculate.layer.shadowOffset = CGSizeMake(0, 4);
+    
+    // 4. Configuración Inicial
     self.lblMessage.alpha = 0;
-    
-    // Aseguramos que el Label pueda tener múltiples líneas (Solución al texto cortado)
-    self.lblMessage.numberOfLines = 0;
-    self.lblMessage.textAlignment = NSTextAlignmentCenter;
-    
-    // Iniciamos la pantalla con la primera opción (Transporte)
-    [self updateUIForSegment:0];
+    self.currentCategoryIndex = 0;
+    [self selectCategory:0]; // Iniciar en Transporte
 }
 
-// -----------------------------------------------------------------------
-// ACCIÓN 1: Cambio de Categoría Principal (Arriba)
-// -----------------------------------------------------------------------
-- (IBAction)segmentChanged:(id)sender {
-    [self updateUIForSegment:self.segmentType.selectedSegmentIndex];
-}
-
-// -----------------------------------------------------------------------
-// ACCIÓN 2: Cambio de Sub-Categoría (Abajo)
-// -----------------------------------------------------------------------
-- (IBAction)subtypeChanged:(id)sender {
-    // Bajamos el teclado si cambian de opción para ver mejor
-    [self.view endEditing:YES];
-}
-
-// Lógica auxiliar para actualizar la UI (Textos, Colores, Opciones)
-- (void)updateUIForSegment:(NSInteger)index {
-    self.txtInput.text = @"";
-    [self.segmentSubtype removeAllSegments]; // Limpiamos el segundo control
-    
-    switch (index) {
-        case 0: // Transporte
-            [self.segmentSubtype insertSegmentWithTitle:@"Auto" atIndex:0 animated:NO];
-            [self.segmentSubtype insertSegmentWithTitle:@"Bus" atIndex:1 animated:NO];
-            [self.segmentSubtype insertSegmentWithTitle:@"Bici" atIndex:2 animated:NO];
-            self.segmentSubtype.selectedSegmentIndex = 0;
-            
-            self.txtInput.placeholder = @"Kilómetros recorridos";
-            self.imgIcon.backgroundColor = [UIColor systemTealColor];
-            break;
-            
-        case 1: // Energía
-            [self.segmentSubtype insertSegmentWithTitle:@"Luces" atIndex:0 animated:NO];
-            [self.segmentSubtype insertSegmentWithTitle:@"TV/PC" atIndex:1 animated:NO];
-            [self.segmentSubtype insertSegmentWithTitle:@"Aire A." atIndex:2 animated:NO];
-            self.segmentSubtype.selectedSegmentIndex = 0;
-            
-            self.txtInput.placeholder = @"Horas de uso";
-            self.imgIcon.backgroundColor = [UIColor systemYellowColor];
-            break;
-            
-        case 2: // Hábito
-            [self.segmentSubtype insertSegmentWithTitle:@"Reciclaje" atIndex:0 animated:NO];
-            [self.segmentSubtype insertSegmentWithTitle:@"Termo" atIndex:1 animated:NO];
-            [self.segmentSubtype insertSegmentWithTitle:@"Vegano" atIndex:2 animated:NO];
-            self.segmentSubtype.selectedSegmentIndex = 0;
-            
-            self.txtInput.placeholder = @"Cantidad / Comidas";
-            self.imgIcon.backgroundColor = [UIColor systemGreenColor];
-            break;
+- (void)styleButton:(UIButton *)btn icon:(NSString *)iconName title:(NSString *)title {
+    if (@available(iOS 15.0, *)) {
+        UIButtonConfiguration *config = [UIButtonConfiguration filledButtonConfiguration];
+        config.title = title;
+        config.image = [UIImage systemImageNamed:iconName];
+        config.imagePlacement = NSDirectionalRectEdgeTop;
+        config.imagePadding = 5;
+        config.cornerStyle = UIButtonConfigurationCornerStyleMedium;
+        
+        config.baseBackgroundColor = [UIColor whiteColor];
+        config.baseForegroundColor = [UIColor darkGrayColor];
+        config.background.strokeColor = [UIColor systemGray5Color];
+        config.background.strokeWidth = 1;
+        
+        btn.configuration = config;
+    } else {
+        [btn setTitle:title forState:UIControlStateNormal];
+        [btn setImage:[UIImage systemImageNamed:iconName] forState:UIControlStateNormal];
     }
 }
 
 // -----------------------------------------------------------------------
-// ACCIÓN 3: Calcular (La Lógica Maestra)
+// ACCIÓN 1: Tocar Botones de Categoría
+// -----------------------------------------------------------------------
+- (IBAction)categoryTapped:(UIButton *)sender {
+    if (sender == self.btnTransport) [self selectCategory:0];
+    else if (sender == self.btnEnergy) [self selectCategory:1];
+    else if (sender == self.btnHabit) [self selectCategory:2];
+}
+
+// Lógica Principal (Cambio de Colores, Textos y Etiquetas)
+- (void)selectCategory:(NSInteger)index {
+    self.currentCategoryIndex = index;
+    
+    NSArray *buttons = @[self.btnTransport, self.btnEnergy, self.btnHabit];
+    
+    // TU COLOR TURQUESA (#5ABFBF)
+    UIColor *myTurquoise = [UIColor colorWithRed:90/255.0 green:191/255.0 blue:191/255.0 alpha:1.0];
+    NSArray *colors = @[myTurquoise, myTurquoise, myTurquoise];
+    
+    // 1. Actualizar botones
+    for (int i = 0; i < buttons.count; i++) {
+        UIButton *btn = buttons[i];
+        BOOL isSelected = (i == index);
+        UIColor *targetColor = colors[i];
+        
+        if (@available(iOS 15.0, *)) {
+            UIButtonConfiguration *config = btn.configuration;
+            if (isSelected) {
+                config.baseBackgroundColor = targetColor;
+                config.baseForegroundColor = [UIColor whiteColor];
+                config.background.strokeWidth = 0;
+            } else {
+                config.baseBackgroundColor = [UIColor whiteColor];
+                config.baseForegroundColor = [UIColor darkGrayColor];
+                config.background.strokeColor = [UIColor systemGray5Color];
+                config.background.strokeWidth = 1;
+            }
+            btn.configuration = config;
+        }
+    }
+    
+    // 2. Limpiar UI
+    [self.segmentSubtype removeAllSegments];
+    self.sliderInput.value = 0;
+    self.lblSliderValue.text = @"0.0";
+    
+    // Color y estilo de imagen
+    self.imgIcon.backgroundColor = myTurquoise;
+    self.imgIcon.tintColor = [UIColor whiteColor];
+    
+    // 3. CAMBIO DE TEXTOS SEGÚN CATEGORÍA (Aquí está la corrección)
+    switch (index) {
+        case 0: // Transporte
+            self.lblInputTitle.text = @"Distancia"; // Título
+            self.lblUnit.text = @"km";              // Unidad
+            
+            self.imgIcon.image = [UIImage systemImageNamed:@"car.fill"];
+            [self.segmentSubtype insertSegmentWithTitle:@"Auto" atIndex:0 animated:NO];
+            [self.segmentSubtype insertSegmentWithTitle:@"Bus" atIndex:1 animated:NO];
+            [self.segmentSubtype insertSegmentWithTitle:@"Bici" atIndex:2 animated:NO];
+            break;
+            
+        case 1: // Energía
+            self.lblInputTitle.text = @"Tiempo de uso"; // Título
+            self.lblUnit.text = @"hrs";                 // Unidad
+            
+            self.imgIcon.image = [UIImage systemImageNamed:@"lightbulb.fill"];
+            [self.segmentSubtype insertSegmentWithTitle:@"Luces" atIndex:0 animated:NO];
+            [self.segmentSubtype insertSegmentWithTitle:@"TV" atIndex:1 animated:NO];
+            [self.segmentSubtype insertSegmentWithTitle:@"Aire" atIndex:2 animated:NO];
+            break;
+            
+        case 2: // Hábito
+            self.lblInputTitle.text = @"Cantidad"; // Título
+            self.lblUnit.text = @"u";              // Unidad
+            
+            self.imgIcon.image = [UIImage systemImageNamed:@"arrow.3.trianglepath"];
+            [self.segmentSubtype insertSegmentWithTitle:@"Reciclar" atIndex:0 animated:NO];
+            [self.segmentSubtype insertSegmentWithTitle:@"Termo" atIndex:1 animated:NO];
+            break;
+    }
+    self.segmentSubtype.selectedSegmentIndex = 0;
+}
+
+// -----------------------------------------------------------------------
+// ACCIÓN 2: Sub-categoría (Cambio de Icono)
+// -----------------------------------------------------------------------
+- (IBAction)subtypeChanged:(id)sender {
+    NSString *iconName = @"";
+    NSInteger subIndex = self.segmentSubtype.selectedSegmentIndex;
+    
+    if (self.currentCategoryIndex == 0) { // TRANSPORTE
+        if (subIndex == 0) iconName = @"car.fill";
+        else if (subIndex == 1) iconName = @"bus.fill";
+        else iconName = @"bicycle";
+        
+    } else if (self.currentCategoryIndex == 1) { // ENERGÍA
+        if (subIndex == 0) iconName = @"lightbulb.fill";
+        else if (subIndex == 1) iconName = @"tv.fill";
+        else iconName = @"wind";
+        
+    } else { // HÁBITO
+        if (subIndex == 0) iconName = @"arrow.3.trianglepath";
+        else iconName = @"drop.fill";
+    }
+    
+    [UIView transitionWithView:self.imgIcon
+                      duration:0.3
+                       options:UIViewAnimationOptionTransitionCrossDissolve
+                    animations:^{
+                        self.imgIcon.image = [UIImage systemImageNamed:iconName];
+                    } completion:nil];
+}
+
+// -----------------------------------------------------------------------
+// ACCIÓN 3: Slider
+// -----------------------------------------------------------------------
+- (IBAction)sliderChanged:(UISlider *)sender {
+    self.lblSliderValue.text = [NSString stringWithFormat:@"%.1f", sender.value];
+}
+
+// -----------------------------------------------------------------------
+// ACCIÓN 4: Calcular
 // -----------------------------------------------------------------------
 - (IBAction)calculatePressed:(id)sender {
-    // 1. Ocultar teclado
-    [self.txtInput resignFirstResponder];
+    float input = self.sliderInput.value;
     
-    // 2. Validar entrada
-    float input = [self.txtInput.text floatValue];
     if (input <= 0) {
-        [self showAlert:@"Ojo" message:@"Ingresa una cantidad válida."];
+        [self showAlert:@"Ups" message:@"Mueve el slider para registrar una cantidad."];
         return;
     }
     
     float co2Result = 0.0;
-    NSString *equivalencia = @"";
-    
-    // 3. Obtener selección
-    NSInteger mainType = self.segmentType.selectedSegmentIndex;
     NSInteger subType = self.segmentSubtype.selectedSegmentIndex;
     
-    // --- CÁLCULOS DETALLADOS ---
-    if (mainType == 0) { // TRANSPORTE
-        if (subType == 0) { co2Result = input * 0.19; }      // Auto
-        else if (subType == 1) { co2Result = input * 0.04; } // Bus
-        else { co2Result = 0.0; }                            // Bici
+    // Cálculo
+    if (self.currentCategoryIndex == 0) { // TRANSPORTE
+        if (subType == 0) co2Result = input * 0.19;
+        else if (subType == 1) co2Result = input * 0.04;
+        else co2Result = 0.0;
         
-    } else if (mainType == 1) { // ENERGÍA
-        if (subType == 0) { co2Result = input * 0.05; }      // Luces
-        else if (subType == 1) { co2Result = input * 0.10; } // TV
-        else { co2Result = input * 0.50; }                   // Aire Acondicionado
+    } else if (self.currentCategoryIndex == 1) { // ENERGÍA
+        if (subType == 0) co2Result = input * 0.05;
+        else if (subType == 1) co2Result = input * 0.10;
+        else co2Result = input * 0.50;
         
-    } else { // HÁBITO (Ahorro)
-        if (subType == 0) { co2Result = -(input * 0.2); }    // Reciclar
-        else if (subType == 1) { co2Result = -(input * 0.5); } // Termo
-        else { co2Result = -(input * 1.5); }                 // Vegano
+    } else { // HÁBITO
+        if (subType == 0) co2Result = -(input * 0.2);
+        else co2Result = -(input * 0.5);
     }
     
-    // --- EQUIVALENCIAS EDUCATIVAS ---
-    float absCO2 = fabsf(co2Result);
-    if (absCO2 == 0) {
-        equivalencia = @"¡Cero emisiones! Sigue así.";
-    } else if (absCO2 < 1.0) {
-        equivalencia = @"Equivale a cargar 50 celulares 📱";
-    } else if (absCO2 < 5.0) {
-        equivalencia = @"Equivale a un foco prendido 2 días 💡";
-    } else {
-        equivalencia = @"Equivale a conducir 20km un auto 🚗";
-    }
-    
-    // 4. GUARDAR DATOS (NSUserDefaults)
+    // Guardar
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     float currentTotal = [defaults floatForKey:@"dailyCO2"];
     float newTotal = currentTotal + co2Result;
@@ -134,16 +211,12 @@
     [defaults setFloat:newTotal forKey:@"dailyCO2"];
     [defaults synchronize];
     
-    // 5. MOSTRAR RESULTADO (ANIMACIÓN Y FEEDBACK)
-    
-    // A. Actualizar texto
-    self.lblMessage.text = [NSString stringWithFormat:@"✅ ¡Guardado!\n%.2f kg\n(%@)", co2Result, equivalencia];
-    self.lblMessage.font = [UIFont systemFontOfSize:14 weight:UIFontWeightMedium];
-    
-    // B. Hacerlo visible (IMPORTANTE: Esto faltaba)
+    // Animación
+    self.lblMessage.text = [NSString stringWithFormat:@"✅ Registrado: %.2f kg", co2Result];
     self.lblMessage.alpha = 1.0;
+    self.lblMessage.font = [UIFont boldSystemFontOfSize:16];
+    self.lblMessage.textColor = [UIColor systemGreenColor];
     
-    // C. Animación de rebote del icono
     [UIView animateWithDuration:0.1 animations:^{
         self.imgIcon.transform = CGAffineTransformMakeScale(1.2, 1.2);
     } completion:^(BOOL finished) {
@@ -152,25 +225,14 @@
         }];
     }];
     
-    // D. Desvanecer mensaje después de 4 segundos
-    [UIView animateWithDuration:0.5 delay:4.0 options:0 animations:^{
+    [UIView animateWithDuration:0.5 delay:3.0 options:0 animations:^{
         self.lblMessage.alpha = 0.0;
     } completion:nil];
-    
-    // Limpiar campo
-    self.txtInput.text = @"";
 }
 
-// Cierra el teclado al tocar el fondo
-- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    [self.view endEditing:YES];
-}
-
-// Método simple para alertas
 - (void)showAlert:(NSString*)title message:(NSString*)msg {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:msg preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
-    [alert addAction:ok];
+    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
     [self presentViewController:alert animated:YES completion:nil];
 }
 

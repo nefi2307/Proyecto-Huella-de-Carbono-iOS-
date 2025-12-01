@@ -7,10 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C70587E42EDD50AB00BC4D06 /* eco_notif.png in Resources */ = {isa = PBXBuildFile; fileRef = C70587E32EDD50AB00BC4D06 /* eco_notif.png */; };
 		C77901192EDD1659002D6140 /* RegisterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C77901182EDD1659002D6140 /* RegisterViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C70587E32EDD50AB00BC4D06 /* eco_notif.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = eco_notif.png; sourceTree = "<group>"; };
 		C77900F72EDCCD63002D6140 /* Proyecto_huella_carbono.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Proyecto_huella_carbono.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C77901172EDD1659002D6140 /* RegisterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RegisterViewController.h; sourceTree = "<group>"; };
 		C77901182EDD1659002D6140 /* RegisterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RegisterViewController.m; sourceTree = "<group>"; };
@@ -51,6 +53,7 @@
 		C77900EE2EDCCD63002D6140 = {
 			isa = PBXGroup;
 			children = (
+				C70587E32EDD50AB00BC4D06 /* eco_notif.png */,
 				C77901172EDD1659002D6140 /* RegisterViewController.h */,
 				C77901182EDD1659002D6140 /* RegisterViewController.m */,
 				C77900F92EDCCD63002D6140 /* Proyecto_huella_carbono */,
@@ -129,6 +132,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C70587E42EDD50AB00BC4D06 /* eco_notif.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

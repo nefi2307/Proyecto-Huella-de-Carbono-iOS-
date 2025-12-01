@@ -4,20 +4,31 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RegisterViewController : UIViewController
 
-// Elementos de la UI
-@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentType; // El selector de arriba
-@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentSubtype; // EL NUEVO (Sub-categorías)
-@property (weak, nonatomic) IBOutlet UIImageView *imgIcon;            // El cuadro gris de imagen
-@property (weak, nonatomic) IBOutlet UITextField *txtInput;           // Donde escriben los números
-@property (weak, nonatomic) IBOutlet UIButton *btnCalculate;          // El botón azul
-@property (weak, nonatomic) IBOutlet UILabel *lblMessage; // El mensaje de feedback
+// --- NUEVOS ELEMENTOS DE DISEÑO ---
+@property (weak, nonatomic) IBOutlet UIButton *btnTransport;
+@property (weak, nonatomic) IBOutlet UIButton *btnEnergy;
+@property (weak, nonatomic) IBOutlet UIButton *btnHabit;
+
+@property (weak, nonatomic) IBOutlet UILabel *lblSliderValue; // El número grande (ej. 15.0)
+@property (weak, nonatomic) IBOutlet UISlider *sliderInput;   // La barra para deslizar
+
+@property (weak, nonatomic) IBOutlet UILabel *lblInputTitle; // El que dice "Distancia"
+@property (weak, nonatomic) IBOutlet UILabel *lblUnit;
+
+// Mantenemos estos del diseño anterior
+@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentSubtype; // (Auto/Bus...)
+@property (weak, nonatomic) IBOutlet UIImageView *imgIcon;               // La imagen grande
+@property (weak, nonatomic) IBOutlet UIButton *btnCalculate;
+@property (weak, nonatomic) IBOutlet UILabel *lblMessage;
 
 
-// Acciones (Eventos)
-- (IBAction)segmentChanged:(id)sender; // Cuando cambian entre Transporte/Energía
-- (IBAction)calculatePressed:(id)sender; // Cuando tocan el botón
 
-- (IBAction)subtypeChanged:(id)sender; // Acción del nuevo control
+// --- ACCIONES ---
+- (IBAction)categoryTapped:(UIButton *)sender; // Cuando tocan uno de los 3 botones de arriba
+- (IBAction)sliderChanged:(UISlider *)sender;  // Cuando mueven el slider
+- (IBAction)subtypeChanged:(id)sender;         // Cuando cambian el subtipo
+- (IBAction)calculatePressed:(id)sender;
+
 @end
 
 NS_ASSUME_NONNULL_END
